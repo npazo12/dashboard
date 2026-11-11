@@ -4,8 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Dashboard</title>
-<!-- Icono para favoritos y pantalla de inicio -->
-<link rel="icon" type="image/png" href="icono.png">
 <style>
 :root{--bg:#f6f5f2;--card:#fff;--tx:#1c1c1a;--mut:#555450;--bd:#dcdad3;--ac:#0f766e;--onac:#fff;--err:#c3002f;--ok:#2e7d4f;--warn:#b26a00;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
@@ -57,20 +55,21 @@ button{cursor:pointer;font-weight:600}
 #lock-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:9999;padding:16px}
 #lock-box{background:var(--card);border:1px solid var(--bd);padding:24px;border-radius:18px;max-width:340px;width:100%;text-align:center}
 #lock-box h2{margin-top:0;font-size:20px}
-#lock-box input{width:100%;margin-bottom:14px;text-align:center;font-size:24px;letter-spacing:6px}
+#lock-box input{width:100%;margin-bottom:12px;font-size:16px}
 #lock-box button{width:100%;background:var(--ac);color:var(--onac);border:0}
 .lock-error{color:var(--err);font-size:14px;margin-top:10px;font-weight:600}
 </style>
 </head>
 <body>
 
-<!-- Pantalla de bloqueo -->
+<!-- Pantalla de acceso -->
 <div id="lock-screen">
   <div id="lock-box">
-    <h2>🔒 Dashboard Protegido</h2>
-    <div class="sub">Ingresa tu PIN de acceso</div>
-    <form id="lock-form" onsubmit="verificarPin(event)">
-      <input type="password" id="pin-input" maxlength="4" placeholder="••••" required autocomplete="current-password">
+    <h2>🔒 Dashboard</h2>
+    <div class="sub">Inicia sesión para ver tus actividades</div>
+    <form id="lock-form" onsubmit="entrar(event)">
+      <input type="email" id="email-input" placeholder="Correo" required autocomplete="username">
+      <input type="password" id="pass-input" placeholder="Contraseña" required autocomplete="current-password">
       <button type="submit">Entrar</button>
     </form>
     <div id="lock-error" class="lock-error"></div>
@@ -84,9 +83,9 @@ button{cursor:pointer;font-weight:600}
     <h1>Dashboard</h1>
     <div class="sub" id="hoy"></div>
   </div>
-  <button onclick="cerrarSesion()" style="padding:10px 16px;font-size:14px;width:auto;">🔒 Bloquear</button>
+  <button onclick="cerrarSesion()" style="padding:10px 16px;font-size:14px;width:auto;">🔒 Cerrar sesión</button>
 </header>
-<div class="sub" id="sync">Sincronización global en la nube activa.</div>
+<div class="sub" id="sync">Conectando con la nube…</div>
 
 <div class="stats">
   <div class="stat"><b id="sTot">0</b><span>Abiertos</span></div>
@@ -120,81 +119,98 @@ button{cursor:pointer;font-weight:600}
 <div class="calbox" id="cal"><div class="empty">Sincronizado con tu calendario Trabajo.</div></div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
-var PIN_SECRETO = "8506";
-var API_BIN = "https://api.jsonbin.io/v3/b/654a9bcf54105e766fc12345"; // Endpoint compartido directo
+/* ===== PEGA AQUÍ LA CONFIGURACIÓN DE TU PROYECTO DE FIREBASE ===== */
+var firebaseConfig = {
+  apiKey: "AIzaSyB0SNib1UsqwH0zpLxWv_W6UK0WhOkWNh0",
+  authDomain: "dashboard-mkt-95e02.firebaseapp.com",
+  projectId: "dashboard-mkt-95e02",
+  appId: "1:747884154633:web:1b7d4c079767868a274dd8"
+};
+/* ================================================================= */
 
-function verificarPin(e){
-  e.preventDefault();
-  var val = document.getElementById("pin-input").value.trim();
-  if(val === PIN_SECRETO){
-    sessionStorage.setItem("auth_dash", "true");
-    mostrarDashboard();
-  } else {
-    document.getElementById("lock-error").textContent = "PIN incorrecto. Intenta de nuevo.";
-    document.getElementById("pin-input").value = "";
-  }
+var ESTATUS = ["Pendiente","En proceso","Listo"];
+var tareas = [];
+var col = null;
+var auth = null;
+var unsub = null;
+var ocupado = false;
+
+function setSync(msg, err){
+  var s = document.getElementById("sync");
+  s.textContent = msg;
+  s.style.color = err ? "var(--err)" : "";
+}
+function avisar(msg){ document.getElementById("estado").textContent = msg; }
+function errLogin(msg){ document.getElementById("lock-error").textContent = msg; }
+
+if(firebaseConfig.apiKey.indexOf("PEGA_AQUI") === 0){
+  errLogin("Falta pegar la configuración de Firebase en el archivo.");
+} else {
+  firebase.initializeApp(firebaseConfig);
+  auth = firebase.auth();
+  col = firebase.firestore().collection("tareas");
+  auth.onAuthStateChanged(function(u){
+    if(u){ mostrarDashboard(); } else { mostrarLogin(); }
+  });
 }
 
+function entrar(e){
+  e.preventDefault();
+  if(!auth){ errLogin("Falta pegar la configuración de Firebase en el archivo."); return; }
+  errLogin("");
+  auth.signInWithEmailAndPassword(
+    document.getElementById("email-input").value.trim(),
+    document.getElementById("pass-input").value
+  ).catch(function(){ errLogin("Correo o contraseña incorrectos."); });
+}
+function cerrarSesion(){ if(auth) auth.signOut(); }
+
+function mostrarLogin(){
+  if(unsub){ unsub(); unsub = null; }
+  tareas = []; pintar();
+  document.getElementById("pass-input").value = "";
+  document.getElementById("main-content").style.display = "none";
+  document.getElementById("lock-screen").style.display = "flex";
+}
 function mostrarDashboard(){
   document.getElementById("lock-screen").style.display = "none";
   document.getElementById("main-content").style.display = "block";
-  sincronizarRemoto();
+  iniciarNube();
 }
 
-function cerrarSesion(){
-  sessionStorage.removeItem("auth_dash");
-  document.getElementById("pin-input").value = "";
-  document.getElementById("lock-error").textContent = "";
-  document.getElementById("main-content").style.display = "none";
-  document.getElementById("lock-screen").style.display = "flex";
-  document.getElementById("pin-input").focus();
+/* ---------- Actividades compartidas (celular y computadora) ---------- */
+function iniciarNube(){
+  if(unsub) return;
+  setSync("Conectando con la nube…");
+  var timer = setTimeout(function(){
+    setSync("Aún no se logra conectar. Lo que ves puede estar desactualizado.", true);
+  }, 10000);
+  unsub = col.onSnapshot(function(snap){
+    if(!snap.metadata.fromCache){ clearTimeout(timer); setSync("Sincronizado en la nube ✓"); }
+    tareas = snap.docs.map(function(d){ var x = d.data(); x.id = d.id; return x; });
+    pintar();
+  }, function(err){
+    clearTimeout(timer);
+    setSync("Error de sincronización (" + (err && err.code || "desconocido") + "). Revisa las reglas de Firestore.", true);
+  });
 }
 
-if(sessionStorage.getItem("auth_dash") === "true"){
-  mostrarDashboard();
+function datosDe(t){ return {n:t.n, ag:t.ag, ar:t.ar, ti:t.ti, f:t.f, e:t.e}; }
+
+async function operar(fn){
+  if(!col){ avisar("Aún no hay conexión con la nube."); return false; }
+  if(ocupado) return false;
+  ocupado = true;
+  try { await fn(); return true; }
+  catch(e){ avisar("No se pudo guardar (" + (e && e.code || "error") + "). Intenta de nuevo."); return false; }
+  finally { ocupado = false; }
 }
 
-var ESTATUS=["Pendiente","En proceso","Listo"];
-var tareas=[];
-
-// Usamos almacenamiento global robusto respaldado por nube compartida en tiempo real
-function sincronizarRemoto(){
-  try {
-    var guardado = localStorage.getItem("nicolas_tareas_global");
-    if(guardado){
-      tareas = JSON.parse(guardado);
-    } else {
-      tareas = [{id:1,n:"Revisar resultados de Meta Ads",ag:"Nissan Tampico",ar:"General",ti:"Meta Ads",f:"",e:"Pendiente"}];
-      guardarGlobal();
-    }
-  } catch(e) {
-    tareas = [];
-  }
-  pintar();
-
-  // Consulta automática cada 2 segundos para reflejar cambios hechos en la PC o celular
-  setInterval(function(){
-    try {
-      var remoto = localStorage.getItem("nicolas_tareas_global");
-      if(remoto){
-        var parsed = JSON.parse(remoto);
-        if(JSON.stringify(parsed) !== JSON.stringify(tareas)){
-          tareas = parsed;
-          pintar();
-        }
-      }
-    } catch(e){}
-  }, 2000);
-}
-
-function guardarGlobal(){
-  try {
-    localStorage.setItem("nicolas_tareas_global", JSON.stringify(tareas));
-  } catch(e){}
-}
-
-function fmt(x){var p=function(n){return String(n).padStart(2,"0")};return x.getFullYear()+"-"+p(x.getMonth()+1)+"-"+p(x.getDate())+"T"+p(x.getHours())+":"+p(x.getMinutes())}
+/* ---------- Utilidades ---------- */
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 function bonita(s){if(!s)return"Sin fecha";return new Date(s).toLocaleString("es-MX",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}
 function mismoDia(a,b){return a.toDateString()===b.toDateString()}
@@ -211,7 +227,7 @@ function pintar(){
   document.getElementById("sHoy").textContent=hoy;
   document.getElementById("sVen").textContent=ven;
   document.getElementById("sOk").textContent=ok;
-  
+
   var html="";
   ESTATUS.forEach(function(est){
     var lista=tareas.filter(function(t){return t.e===est&&(!ag||t.ag===ag)&&(!ar||t.ar===ar)&&(!ti||t.ti===ti)});
@@ -220,10 +236,10 @@ function pintar(){
     if(!lista.length)html+='<div class="empty">Sin actividades</div>';
     lista.forEach(function(t){
       var late=t.e!=="Listo"&&t.f&&new Date(t.f)<ahora;
-      html+='<div class="t"><div class="n">'+esc(t.n)+'</div><div class="m'+(late?' late':'')+'">'+esc(t.ag)+' · '+esc(t.ar)+(t.ti?' · '+esc(t.ti):'')+'<br>'+bonita(t.f)+(late?' (vencido)':'')+'</div><div class="acts">';
-      if(est!=="Pendiente")html+='<button data-a="prev" data-i="'+t.id+'">← Atrás</button>';
-      if(est!=="Listo")html+='<button data-a="next" data-i="'+t.id+'">Avanzar →</button>';
-      html+='<button data-a="edit" data-i="'+t.id+'" style="background:var(--bd);color:var(--tx);">Editar</button><button data-a="del" data-i="'+t.id+'" style="background:#fde8e8;color:var(--err);">Borrar</button></div></div>';
+      html+='<div class="t '+esc(t.p||"")+'"><div class="n">'+esc(t.n)+'</div><div class="m'+(late?' late':'')+'">'+esc(t.ag)+' · '+esc(t.ar)+(t.ti?' · '+esc(t.ti):'')+'<br>'+bonita(t.f)+(late?' (vencido)':'')+'</div><div class="acts">';
+      if(est!=="Pendiente")html+='<button data-a="prev" data-i="'+esc(t.id)+'">← Atrás</button>';
+      if(est!=="Listo")html+='<button data-a="next" data-i="'+esc(t.id)+'">Avanzar →</button>';
+      html+='<button data-a="edit" data-i="'+esc(t.id)+'" style="background:var(--bd);color:var(--tx);">Editar</button><button data-a="del" data-i="'+esc(t.id)+'" style="background:#fde8e8;color:var(--err);">Borrar</button></div></div>';
     });
     html+='</div>';
   });
@@ -231,25 +247,33 @@ function pintar(){
 }
 
 document.getElementById("hoy").textContent=new Date().toLocaleDateString("es-MX",{weekday:"long",day:"numeric",month:"long"});
-document.getElementById("f").addEventListener("submit",function(e){
+
+/* ---------- Agregar ---------- */
+document.getElementById("f").addEventListener("submit",async function(e){
   e.preventDefault();
   if(EDIT!==null){editarGuardar();return}
-  var t={id:Date.now(),n:document.getElementById("nombre").value.trim(),ag:document.getElementById("agencia").value,ar:document.getElementById("area").value,ti:document.getElementById("tipo").value,f:document.getElementById("fecha").value,e:"Pendiente"};
-  tareas.push(t);
-  document.getElementById("nombre").value="";document.getElementById("fecha").value="";extras();
-  guardarGlobal();
-  document.getElementById("estado").textContent="Actividad guardada.";
+  var nombre=document.getElementById("nombre").value.trim();
+  if(!nombre)return;
+  var t={n:nombre,ag:document.getElementById("agencia").value,ar:document.getElementById("area").value,ti:document.getElementById("tipo").value,f:document.getElementById("fecha").value,e:"Pendiente"};
+  var ok=await operar(function(){return col.doc(String(Date.now())).set(t)});
+  if(ok){
+    document.getElementById("nombre").value="";document.getElementById("fecha").value="";extras();
+    avisar("Actividad guardada.");
+  }
 });
-document.getElementById("cols").addEventListener("click",function(e){
+
+/* ---------- Avanzar / retroceder / editar / borrar ---------- */
+document.getElementById("cols").addEventListener("click",async function(e){
   var b=e.target.closest("button");if(!b)return;
-  var id=Number(b.dataset.i),i=tareas.findIndex(function(t){return t.id===id});if(i<0)return;
-  if(b.dataset.a==="edit"){editar(tareas[i]);return}
-  var k=ESTATUS.indexOf(tareas[i].e);
-  if(b.dataset.a==="next")tareas[i].e=ESTATUS[k+1];
-  if(b.dataset.a==="prev")tareas[i].e=ESTATUS[k-1];
-  if(b.dataset.a==="del")tareas.splice(i,1);
-  guardarGlobal();
+  var id=b.dataset.i,t=tareas.filter(function(x){return x.id===id})[0];if(!t)return;
+  if(b.dataset.a==="edit"){editar(t);return}
+  var k=ESTATUS.indexOf(t.e);
+  if(b.dataset.a==="next")await operar(function(){return col.doc(id).update({e:ESTATUS[k+1]})});
+  if(b.dataset.a==="prev")await operar(function(){return col.doc(id).update({e:ESTATUS[k-1]})});
+  if(b.dataset.a==="del")await operar(function(){return col.doc(id).delete()});
 });
+
+/* ---------- Filtros y áreas ---------- */
 document.getElementById("fAg").addEventListener("change",function(){areasFiltro();pintar()});
 document.getElementById("fTi").addEventListener("change",pintar);
 document.getElementById("agencia").addEventListener("change",areasForm);
@@ -259,6 +283,7 @@ function llenar(sel,lista,todas){var v=sel.value;sel.innerHTML=(todas?'<option v
 function areasForm(){llenar(document.getElementById("area"),AREAS[document.getElementById("agencia").value],false)}
 function areasFiltro(){var ag=document.getElementById("fAg").value;llenar(document.getElementById("fAr"),ag?AREAS[ag]:AREAS["Nissan Tampico"],true)}
 
+/* ---------- Edición ---------- */
 var EDIT=null;
 function editar(t){
   EDIT=t.id;
@@ -273,17 +298,24 @@ function editar(t){
   n.focus();window.scrollTo({top:0,behavior:"smooth"});
 }
 function salirEdicion(){EDIT=null;document.getElementById("btnAdd").textContent="Agregar actividad";document.getElementById("btnCancel").hidden=true}
-function editarGuardar(){
+async function editarGuardar(){
   var g=function(i){return document.getElementById(i).value};
   var o=tareas.filter(function(x){return x.id===EDIT})[0];
-  if(o){o.n=g("nombre").trim();o.ag=g("agencia");o.ar=g("area");o.ti=g("tipo");o.f=g("fecha")}
-  document.getElementById("nombre").value="";document.getElementById("fecha").value="";
-  salirEdicion();extras();guardarGlobal();
+  if(!o){salirEdicion();return}
+  var nuevo=datosDe(o);
+  nuevo.n=g("nombre").trim();nuevo.ag=g("agencia");nuevo.ar=g("area");nuevo.ti=g("tipo");nuevo.f=g("fecha");
+  var id=EDIT;
+  var ok=await operar(function(){return col.doc(id).set(nuevo)});
+  if(ok){
+    document.getElementById("nombre").value="";document.getElementById("fecha").value="";
+    salirEdicion();extras();avisar("Cambios guardados.");
+  }
 }
 function extras(){var i=document.getElementById("nombre"),v=i.value;if(v&&v.charAt(0)!==v.charAt(0).toUpperCase()){var p=i.selectionStart;i.value=v.charAt(0).toUpperCase()+v.slice(1);try{i.setSelectionRange(p,p)}catch(e){}}document.getElementById("extra").hidden=!i.value.trim()}
 document.getElementById("nombre").addEventListener("input",extras);
 document.getElementById("btnCancel").addEventListener("click",function(){salirEdicion();document.getElementById("nombre").value="";document.getElementById("fecha").value="";extras();document.getElementById("estado").textContent=""});
-areasForm();areasFiltro();
+
+areasForm();areasFiltro();pintar();
 </script>
 </body>
 </html>
