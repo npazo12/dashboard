@@ -50,25 +50,28 @@ button{cursor:pointer;font-weight:700}
 .ev a{color:var(--tx);text-decoration:none}
 .ev a:hover{text-decoration:underline}
 
-/* --- VERSIÓN COMPUTADORA (Pantallas mayores a 768px) --- */
+/* --- VERSIÓN COMPUTADORA (Pantallas mayores a 768px: Ancho total de pantalla) --- */
 @media(min-width:768px){
-  body{padding:24px;font-size:15px} /* Texto más compacto y profesional en PC */
+  body{padding:24px 32px;font-size:14px;max-width:100% !important} /* Ocupa todo el monitor sin restricciones */
   .stats{grid-template-columns:repeat(4,1fr);gap:16px}
-  .stat b{font-size:28px}
+  .stat b{font-size:26px}
   form{grid-template-columns:repeat(3,1fr);align-items:end;padding:20px}
   form input[type=text]{grid-column:1/-1}
   .extra{grid-column:1/-1;grid-template-columns:repeat(3,1fr)}
-  input,select,button{font-size:15px;padding:11px}
-  .add{font-size:15px;padding:11px}
+  input,select,button{font-size:14px;padding:10px}
+  .add{font-size:14px;padding:10px}
   .filters{display:flex;gap:12px}
-  /* Las 3 columnas obligatorias una al lado de la otra ocupando toda la pantalla */
-  .cols{grid-template-columns:repeat(3,1fr);gap:20px;align-items:start}
-  .col{min-height:300px;padding:18px}
-  .col h2{font-size:17px}
-  .t{padding:12px;margin-bottom:10px}
-  .t .n{font-size:16px}
+  .filters select{padding:10px;font-size:14px}
+  
+  /* Sistema de 3 columnas distribuidas uniformemente ocupando todo el ancho */
+  .cols{display:grid;grid-template-columns:repeat(3, 1fr);gap:24px;align-items:start;width:100%}
+  .col{min-height:400px;padding:20px}
+  .col h2{font-size:18px}
+  .t{padding:14px;margin-bottom:12px}
+  .t .n{font-size:15px}
   .t .m{font-size:13px}
-  .acts button{padding:6px 10px;font-size:13px}
+  .acts{gap:6px}
+  .acts button{padding:6px 8px;font-size:12px}
 }
 
 /* Pantalla de acceso */
