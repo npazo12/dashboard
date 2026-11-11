@@ -56,7 +56,7 @@ button{cursor:pointer}
 </head>
 <body>
 
-<!-- Pantalla de bloqueo con PIN Cifrado -->
+<!-- Pantalla de bloqueo -->
 <div id="lock-screen">
   <div id="lock-box">
     <h2>🔒 Dashboard Protegido</h2>
@@ -113,22 +113,12 @@ button{cursor:pointer}
 </div>
 
 <script>
-// Hash SHA-256 correspondiente al PIN 8506 (imposible de adivinar viendo el código)
-var HASH_SECRETO = "b6e3fef92330a103c80cf0e1d528b17ee92569ff493f3607fa6d4fcb128c7c94";
+var PIN_SECRETO = "8506";
 
-async function encriptarSHA256(texto) {
-  var msgUint8 = new TextEncoder().encode(texto);
-  var hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
-  var hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-async function verificarPin(e){
+function verificarPin(e){
   e.preventDefault();
-  var val = document.getElementById("pin-input").value;
-  var hashIngresado = await encriptarSHA256(val);
-  
-  if(hashIngresado === HASH_SECRETO){
+  var val = document.getElementById("pin-input").value.trim();
+  if(val === PIN_SECRETO){
     sessionStorage.setItem("auth_dash", "true");
     mostrarDashboard();
   } else {
