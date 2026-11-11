@@ -11,6 +11,7 @@ box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:en
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:16px;max-width:1000px;margin-inline:auto}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
 h1{font-size:22px;margin:0 0 2px}
 .sub{color:var(--mut);font-size:14px;margin-bottom:16px}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:16px}
@@ -44,12 +45,40 @@ button{cursor:pointer}
 .ev:last-child{border:0}
 .ev time{color:var(--mut);min-width:140px;font-size:13px}
 .ev a{color:var(--tx)}
+/* Pantalla de bloqueo */
+#lock-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:9999;padding:16px}
+#lock-box{background:var(--card);border:1px solid var(--bd);padding:24px;border-radius:16px;max-width:320px;width:100%;text-align:center}
+#lock-box h2{margin-top:0;font-size:18px}
+#lock-box input{width:100%;margin-bottom:12px;text-align:center;font-size:20px;letter-spacing:4px}
+#lock-box button{width:100%;background:var(--ac);color:var(--onac);border:0;font-weight:600}
+.lock-error{color:var(--err);font-size:13px;margin-top:8px}
 </style>
 </head>
 <body>
-<h1>Dashboard de Trabajo</h1>
-<div class="sub" id="hoy"></div>
-<div class="sub" id="sync">Tus tareas se guardan de forma privada en tu dispositivo y navegador.</div>
+
+<!-- Pantalla de bloqueo con PIN Cifrado -->
+<div id="lock-screen">
+  <div id="lock-box">
+    <h2>🔒 Dashboard Protegido</h2>
+    <div class="sub">Ingresa tu PIN de acceso</div>
+    <form id="lock-form" onsubmit="verificarPin(event)">
+      <input type="password" id="pin-input" maxlength="4" placeholder="••••" required autocomplete="current-password">
+      <button type="submit">Entrar</button>
+    </form>
+    <div id="lock-error" class="lock-error"></div>
+  </div>
+</div>
+
+<!-- Contenido Principal -->
+<div id="main-content" style="display:none;">
+<header>
+  <div>
+    <h1>Dashboard de Trabajo</h1>
+    <div class="sub" id="hoy"></div>
+  </div>
+  <button onclick="cerrarSesion()" style="padding:6px 12px;font-size:13px;">🔒 Bloquear / Salir</button>
+</header>
+<div class="sub" id="sync">Acceso privado protegido.</div>
 
 <div class="stats">
   <div class="stat"><b id="sTot">0</b><span>Abiertos</span></div>
@@ -81,8 +110,53 @@ button{cursor:pointer}
 <div class="cols" id="cols"></div>
 <h2 class="ch">Calendario Trabajo</h2>
 <div class="calbox" id="cal"><div class="empty">Sincronizado con tu calendario Trabajo.</div></div>
+</div>
 
 <script>
+// Hash SHA-256 correspondiente al PIN 8506 (imposible de adivinar viendo el código)
+var HASH_SECRETO = "b6e3fef92330a103c80cf0e1d528b17ee92569ff493f3607fa6d4fcb128c7c94";
+
+async function encriptarSHA256(texto) {
+  var msgUint8 = new TextEncoder().encode(texto);
+  var hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+  var hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function verificarPin(e){
+  e.preventDefault();
+  var val = document.getElementById("pin-input").value;
+  var hashIngresado = await encriptarSHA256(val);
+  
+  if(hashIngresado === HASH_SECRETO){
+    sessionStorage.setItem("auth_dash", "true");
+    mostrarDashboard();
+  } else {
+    document.getElementById("lock-error").textContent = "PIN incorrecto. Intenta de nuevo.";
+    document.getElementById("pin-input").value = "";
+  }
+}
+
+function mostrarDashboard(){
+  document.getElementById("lock-screen").style.display = "none";
+  document.getElementById("main-content").style.display = "block";
+  cargar();pintar();
+}
+
+function cerrarSesion(){
+  sessionStorage.removeItem("auth_dash");
+  document.getElementById("pin-input").value = "";
+  document.getElementById("lock-error").textContent = "";
+  document.getElementById("main-content").style.display = "none";
+  document.getElementById("lock-screen").style.display = "flex";
+  document.getElementById("pin-input").focus();
+}
+
+// Si ya había iniciado sesión en esta pestaña, entra directo
+if(sessionStorage.getItem("auth_dash") === "true"){
+  mostrarDashboard();
+}
+
 var KEY="pendientes-nicolas-v1";
 var ESTATUS=["Pendiente","En proceso","Listo"];
 var tareas=[];
@@ -182,7 +256,7 @@ function editarGuardar(){
 function extras(){var i=document.getElementById("nombre"),v=i.value;if(v&&v.charAt(0)!==v.charAt(0).toUpperCase()){var p=i.selectionStart;i.value=v.charAt(0).toUpperCase()+v.slice(1);try{i.setSelectionRange(p,p)}catch(e){}}document.getElementById("extra").hidden=!i.value.trim()}
 document.getElementById("nombre").addEventListener("input",extras);
 document.getElementById("btnCancel").addEventListener("click",function(){salirEdicion();document.getElementById("nombre").value="";document.getElementById("fecha").value="";extras();document.getElementById("estado").textContent=""});
-areasForm();areasFiltro();cargar();pintar();
+areasForm();areasFiltro();
 </script>
 </body>
 </html>
