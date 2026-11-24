@@ -7,9 +7,8 @@
 <!-- Icono para favoritos y pantalla de inicio -->
 <link rel="icon" type="image/png" href="icono.png">
 <style>
-:root{--bg:#f6f5f2;--card:#fff;--tx:#1c1c1a;--mut:#4a4944;--bd:#dcdad3;--ac:#0f766e;--onac:#fff;--err:#c3002f;--ok:#2e7d4f;--warn:#b26a00;
-box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121211;--card:#1c1c1a;--tx:#f4f3ef;--mut:#b0afa6;--bd:#3a3933;--ac:#2dd4bf;--onac:#04201c;--err:#ff5c7c;--ok:#5fc08a;--warn:#e8a94a;color-scheme:dark}}
+:root{--bg:#1c1c1e;--card:#2c2c2e;--tx:#f5f5f7;--mut:#98989d;--bd:#3a3a3c;--ac:#0a84ff;--onac:#fff;--err:#ff453a;--ok:#30d158;--warn:#ff9f0a;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
 
@@ -81,6 +80,26 @@ button{cursor:pointer;font-weight:700}
 #lock-box input{width:100%;margin-bottom:18px;font-size:20px;padding:18px}
 #lock-box button{width:100%;background:var(--ac);color:var(--onac);border:0;padding:18px;font-size:20px}
 .lock-error{color:var(--err);font-size:18px;margin-top:14px;font-weight:800}
+
+/* --- ESTÉTICA OSCURA TIPO APPLE (solo colores y acabados) --- */
+body{font-family:-apple-system,BlinkMacSystemFont,"Inter","SF Pro Text",system-ui,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+header{background:var(--bg);border-radius:14px}
+.stat,form,.calbox,#lock-box{box-shadow:none;border-radius:14px}
+.col{background:var(--bg);box-shadow:none;border-radius:14px}
+.col h2{border-bottom:1px solid var(--bd);letter-spacing:-.01em}
+.t{background:var(--card);border:1px solid var(--bd);border-left:4px solid var(--mut);border-radius:12px;box-shadow:none}
+.t.Alta{border-color:#0a84ff;background:#10294a}
+input,select,button{background:var(--bg);border:1px solid #48484a;border-radius:10px}
+input:focus,select:focus{outline:none;border-color:var(--ac)}
+button{background:var(--bd);color:var(--tx)}
+.add,#lock-box button{background:var(--ac);color:#fff;border:0;border-radius:999px}
+.acts button{background:var(--bd)}
+.acts button[data-a="next"]{background:rgba(10,132,255,.18);color:#4da3ff}
+.acts button[data-a="del"]{background:rgba(255,69,58,.16)!important;color:var(--err)!important}
+.ev a{color:var(--tx)}
+#lock-screen{background:var(--bg)}
+#lock-form{display:flex;flex-direction:column;gap:0;padding:0;border:0;background:transparent;margin-bottom:0}
+#lock-form input,#lock-form button{width:100%}
 </style>
 </head>
 <body>
@@ -88,7 +107,7 @@ button{cursor:pointer;font-weight:700}
 <!-- Pantalla de acceso -->
 <div id="lock-screen">
   <div id="lock-box">
-    <h2>🔒 Dashboard</h2>
+    <h2>Dashboard</h2>
     <div class="sub">Inicia sesión para ver tus actividades</div>
     <form id="lock-form" onsubmit="entrar(event)">
       <input type="email" id="email-input" placeholder="Correo" required autocomplete="username">
