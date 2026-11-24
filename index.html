@@ -105,6 +105,24 @@ button{background:var(--bd);color:var(--tx)}
 #lock-screen{background:var(--bg)}
 #lock-form{display:flex;flex-direction:column;gap:0;padding:0;border:0;background:transparent;margin-bottom:0}
 #lock-form input,#lock-form button{width:100%}
+
+/* --- TARJETAS ESTILO APPLE --- */
+.col{padding:18px 14px}
+.col h2{font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);border-bottom:0;padding:0 6px 4px;margin:0 0 12px}
+.t,.t.Alta,.t.Media,.t.Baja{background:var(--card);border:0;border-radius:16px;padding:16px 16px 12px;margin-bottom:12px;box-shadow:0 0 0 1px rgba(255,255,255,.05);transition:background .2s ease,transform .2s ease}
+.t:hover{background:#333336}
+.t.Alta{box-shadow:0 0 0 1px rgba(10,132,255,.5)}
+.t .n{font-size:16px;font-weight:600;letter-spacing:-.01em;line-height:1.3;margin-bottom:6px}
+.t .m{font-size:13px;line-height:1.55;margin-top:0;color:var(--mut);font-weight:400}
+.t .m.late{color:var(--err);font-weight:500}
+.acts{gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.07);justify-content:flex-end}
+.acts button.ic{flex:0 0 32px;width:32px;height:32px;border-radius:50%;border:0;background:rgba(255,255,255,.08)!important;color:var(--mut)!important;transition:background .15s ease,color .15s ease}
+.acts button.ic svg{width:16px;height:16px}
+.acts button.ic:hover{background:rgba(255,255,255,.16)!important;color:var(--tx)!important}
+.acts button.ic[data-a="next"]{background:rgba(10,132,255,.2)!important;color:#4da3ff!important}
+.acts button.ic[data-a="next"]:hover{background:rgba(10,132,255,.32)!important}
+.acts button.ic[data-a="del"]:hover{background:rgba(217,130,122,.2)!important;color:var(--err)!important}
+.empty{font-size:14px}
 </style>
 </head>
 <body>
