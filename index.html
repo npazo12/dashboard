@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <!-- Icono para favoritos y pantalla de inicio -->
 <link rel="icon" type="image/png" href="icono.png">
 <style>
@@ -228,6 +231,184 @@ html[data-theme="light"] .acts button.ic[data-a="next"]{background:rgba(0,122,25
 html[data-theme="light"] .acts button.ic[data-a="next"]:hover{background:rgba(0,122,255,.2)!important}
 html[data-theme="light"] .acts button.ic[data-a="del"]:hover{background:rgba(196,96,90,.15)!important;color:#c4605a!important}
 html[data-theme="light"] .add,html[data-theme="light"] #lock-box button{background:#007aff;color:#fff}
+
+/* ================================================================
+   GUÍA DE DISEÑO — Plus Jakarta Sans, tokens oklch, vidrio, radios
+   (el tema sigue alternándose con data-theme en <html>)
+   ================================================================ */
+html[data-theme]{
+  --font-sans:"Plus Jakarta Sans",ui-sans-serif,system-ui,sans-serif;
+  --background:oklch(0.975 0.005 260);
+  --foreground:oklch(0.129 0.042 264.695);
+  --card:oklch(1 0 0);
+  --popover:oklch(1 0 0);
+  --primary:oklch(0.208 0.042 265.755);
+  --primary-foreground:oklch(0.984 0.003 247.858);
+  --secondary:oklch(0.968 0.007 247.896);
+  --muted:oklch(0.968 0.007 247.896);
+  --muted-foreground:oklch(0.554 0.046 257.417);
+  --accent:oklch(0.968 0.007 247.896);
+  --destructive:oklch(0.577 0.245 27.325);
+  --border:oklch(0.929 0.013 255.508);
+  --input:oklch(0.929 0.013 255.508);
+  --ring:oklch(0.704 0.04 256.788);
+  --pending:oklch(0.6 0.19 255);
+  --progress:oklch(0.72 0.17 60);
+  --done:oklch(0.66 0.16 155);
+  --overdue:oklch(0.6 0.2 300);
+  --glow:radial-gradient(60% 80% at 15% 0%,oklch(0.6 0.19 255 / 12%),transparent 70%),radial-gradient(50% 60% at 90% 10%,oklch(0.6 0.2 300 / 10%),transparent 70%);
+  /* variables antiguas apuntando a los tokens nuevos */
+  --bg:var(--background);--tx:var(--foreground);--mut:var(--muted-foreground);--bd:var(--border);
+  --ac:var(--pending);--onac:oklch(1 0 0);--err:var(--destructive);--ok:var(--done);--warn:var(--progress);
+  color-scheme:light;
+}
+html[data-theme="dark"]{
+  --background:oklch(0.14 0.02 265);
+  --foreground:oklch(0.97 0.005 260);
+  --card:oklch(0.19 0.025 265);
+  --primary:oklch(0.929 0.013 255.508);
+  --primary-foreground:oklch(0.208 0.042 265.755);
+  --muted:oklch(0.279 0.041 260.031);
+  --muted-foreground:oklch(0.704 0.04 256.788);
+  --accent:oklch(0.279 0.041 260.031);
+  --border:oklch(1 0 0 / 10%);
+  --input:oklch(1 0 0 / 15%);
+  --ring:oklch(0.551 0.027 264.364);
+  --pending:oklch(0.7 0.16 255);
+  --progress:oklch(0.8 0.15 70);
+  --done:oklch(0.76 0.15 155);
+  --overdue:oklch(0.72 0.17 300);
+  --glow:radial-gradient(60% 80% at 15% 0%,oklch(0.55 0.2 260 / 30%),transparent 70%),radial-gradient(50% 60% at 90% 10%,oklch(0.55 0.2 300 / 22%),transparent 70%);
+  color-scheme:dark;
+}
+
+/* Fondo con resplandor (en <html> para que cubra toda la pantalla) */
+html[data-theme]{background-color:var(--background);background-image:var(--glow);background-attachment:fixed;background-repeat:no-repeat}
+html[data-theme][data-theme] body{background:transparent;color:var(--foreground);font-family:var(--font-sans);font-size:14px;max-width:1344px!important;margin-inline:auto;padding:24px 16px;min-height:100vh}
+
+/* Superficie de vidrio (tarjetas y campos) */
+html[data-theme][data-theme] .stat,
+html[data-theme][data-theme] #f,
+html[data-theme][data-theme] .calbox,
+html[data-theme][data-theme] #lock-box,
+html[data-theme][data-theme] .filters select,
+html[data-theme][data-theme] #tema{
+  background:color-mix(in oklab,var(--card) 70%,transparent);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  border:1px solid var(--border);box-shadow:none;
+}
+
+/* Encabezado */
+html[data-theme][data-theme] header>div:first-child{display:flex;flex-direction:column-reverse;gap:4px}
+html[data-theme][data-theme] h1{font-size:30px;font-weight:800;letter-spacing:-.025em;line-height:1.1;margin:0}
+html[data-theme][data-theme] #hoy{font-size:14px;font-weight:500;color:var(--muted-foreground);line-height:1.4}
+html[data-theme][data-theme] #hoy::first-letter{text-transform:uppercase}
+html[data-theme][data-theme] #tema{width:40px;height:40px;padding:0;border-radius:999px;color:var(--foreground)}
+html[data-theme][data-theme] #tema svg{width:20px;height:20px}
+html[data-theme][data-theme] header button:not(#tema){height:40px;padding:0 20px!important;font-size:14px!important;font-weight:600;border:0;border-radius:999px;background:var(--primary)!important;color:var(--primary-foreground)!important;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;transition:opacity .2s ease}
+html[data-theme][data-theme] header button:not(#tema):hover{opacity:.9}
+
+/* Pastilla "Sincronizado en la nube" */
+html[data-theme][data-theme] #sync{display:inline-flex;align-items:center;gap:6px;width:fit-content;margin:4px 0 16px;padding:6px 12px;border-radius:999px;font-size:12px;line-height:1.3;color:var(--done);background:color-mix(in oklab,var(--done) 15%,transparent)}
+html[data-theme][data-theme] #sync[style*="--err"]{background:color-mix(in oklab,var(--destructive) 15%,transparent)}
+html[data-theme][data-theme] #estado{font-size:14px;color:var(--muted-foreground)}
+
+/* Contadores */
+html[data-theme][data-theme] .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:0;margin-bottom:16px;background:transparent;border:0;border-radius:0;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+html[data-theme][data-theme] .stat{display:grid;grid-template-columns:44px 1fr;column-gap:12px;align-items:center;text-align:left;padding:16px;border-radius:18px}
+html[data-theme][data-theme] .stat svg{grid-column:1;grid-row:1/3;display:block;margin:0;width:44px;height:44px;padding:12px;border-radius:14px;stroke-width:2}
+html[data-theme][data-theme] .stat b{grid-column:2;grid-row:1;align-self:end;font-size:24px;font-weight:700;line-height:1;margin:0;color:var(--foreground)}
+html[data-theme][data-theme] .stat span{grid-column:2;grid-row:2;align-self:start;margin-top:4px;font-size:12px;font-weight:500;color:var(--muted-foreground)}
+html[data-theme][data-theme] .stat:nth-child(1) svg{color:var(--pending)!important;background:color-mix(in oklab,var(--pending) 15%,transparent)}
+html[data-theme][data-theme] .stat:nth-child(2) svg{color:var(--progress)!important;background:color-mix(in oklab,var(--progress) 15%,transparent)}
+html[data-theme][data-theme] .stat:nth-child(3) svg{color:var(--overdue)!important;background:color-mix(in oklab,var(--overdue) 15%,transparent)}
+html[data-theme][data-theme] .stat:nth-child(4) svg{color:var(--done)!important;background:color-mix(in oklab,var(--done) 15%,transparent)}
+
+/* Campo de actividad y formulario */
+html[data-theme][data-theme] #f{padding:8px;gap:8px;border-radius:18px;margin-bottom:12px}
+html[data-theme][data-theme] #f:focus-within{border-color:var(--ring)}
+html[data-theme][data-theme] input,
+html[data-theme][data-theme] select{height:44px;padding:0 14px;border-radius:14px;font-family:inherit;font-size:14px;font-weight:500;color:var(--foreground);background:var(--muted);border:1px solid var(--border);box-shadow:none}
+html[data-theme][data-theme] input::placeholder{color:var(--muted-foreground);opacity:1}
+html[data-theme][data-theme] input:focus,
+html[data-theme][data-theme] select:focus{outline:none;border-color:var(--ring);box-shadow:0 0 0 3px color-mix(in oklab,var(--ring) 40%,transparent)}
+html[data-theme][data-theme] #f #nombre{background:transparent;border:0;border-radius:14px;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;padding:0 12px}
+html[data-theme][data-theme] #f #nombre:focus{box-shadow:none}
+html[data-theme][data-theme] #f .extra select,
+html[data-theme][data-theme] #f .extra input{background:var(--muted);border:1px solid var(--border)}
+html[data-theme][data-theme] .lb{font-size:12px;font-weight:500;color:var(--muted-foreground)}
+html[data-theme][data-theme] .add{height:44px;padding:0 20px;border:0;border-radius:14px;background:var(--pending);color:oklch(1 0 0);font-size:14px;font-weight:600;transition:opacity .2s ease}
+html[data-theme][data-theme] .add:hover{opacity:.9}
+html[data-theme][data-theme] #btnCancel{height:44px;padding:0 20px;border-radius:14px;font-size:14px;font-weight:600;border:0}
+html[data-theme][data-theme] option{background:var(--card);color:var(--foreground)}
+
+/* Filtros */
+html[data-theme][data-theme] .filters{gap:12px;margin-bottom:16px}
+html[data-theme][data-theme] .filters select{height:44px;padding:0 14px;border-radius:14px;font-size:14px;font-weight:500;color:var(--foreground)}
+
+/* Columnas */
+html[data-theme][data-theme] .cols{display:grid;grid-template-columns:1fr;gap:24px;align-items:start}
+html[data-theme][data-theme] .col{background:color-mix(in oklab,var(--muted) 30%,transparent);border:1px solid var(--border);border-radius:22px;padding:12px;min-height:0;box-shadow:none}
+html[data-theme][data-theme] .col h2{display:flex;align-items:center;gap:8px;margin:2px 0 12px;padding:4px 4px 0;font-size:14px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--foreground)}
+html[data-theme][data-theme] .col h2::before{width:10px;height:10px;margin:0;flex:none;border-radius:50%}
+html[data-theme][data-theme] .col:nth-child(1) h2::before{background:var(--pending)}
+html[data-theme][data-theme] .col:nth-child(2) h2::before{background:var(--progress)}
+html[data-theme][data-theme] .col:nth-child(3) h2::before{background:var(--done)}
+html[data-theme][data-theme] .col .cnt{margin-left:auto;min-width:24px;padding:2px 10px;border-radius:999px;background:var(--card);font-size:12px;font-weight:700;letter-spacing:0;line-height:1.5;text-align:center}
+html[data-theme][data-theme] .col:nth-child(1) .cnt{color:var(--pending)}
+html[data-theme][data-theme] .col:nth-child(2) .cnt{color:var(--progress)}
+html[data-theme][data-theme] .col:nth-child(3) .cnt{color:var(--done)}
+html[data-theme][data-theme] .empty{font-size:14px;color:var(--muted-foreground);padding:20px}
+
+/* Tarjeta de actividad */
+html[data-theme][data-theme] .t,
+html[data-theme][data-theme] .t.Alta,
+html[data-theme][data-theme] .t.Media,
+html[data-theme][data-theme] .t.Baja{position:relative;overflow:hidden;margin-bottom:12px;padding:16px;border:0;border-radius:18px;background:var(--card);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:0 1px 2px rgba(0,0,0,.05);transition:transform .2s ease,box-shadow .2s ease}
+html[data-theme][data-theme] .t:hover{background:var(--card);transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.10)}
+html[data-theme][data-theme] .t::before{content:"";position:absolute;inset-block:0;left:0;width:4px;background:var(--pending)}
+html[data-theme][data-theme] .col:nth-child(2) .t::before{background:var(--progress)}
+html[data-theme][data-theme] .col:nth-child(3) .t::before{background:var(--done)}
+html[data-theme][data-theme] .t .n{margin:0 0 8px;font-size:16px;font-weight:600;line-height:1.3;letter-spacing:0;color:var(--foreground)}
+html[data-theme][data-theme] .chips{display:flex;flex-wrap:wrap;gap:6px}
+html[data-theme][data-theme] .chip{padding:2px 8px;border-radius:6px;background:var(--muted);color:var(--muted-foreground);font-size:12px;line-height:1.5}
+html[data-theme][data-theme] .foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-top:12px}
+html[data-theme][data-theme] .t .m,
+html[data-theme][data-theme] .t .m.late{display:flex;align-items:center;gap:6px;margin:0;font-size:12px;font-weight:500;line-height:1.4;color:var(--muted-foreground)}
+html[data-theme][data-theme] .t .m.late{color:var(--overdue)}
+html[data-theme][data-theme] .t .m svg{width:14px;height:14px;flex:none}
+
+/* Botones de acción (íconos) */
+html[data-theme][data-theme] .acts{gap:4px;margin:0 0 0 auto;padding:0;border:0;flex:none;justify-content:flex-end}
+html[data-theme][data-theme] .acts button.ic{flex:0 0 32px;width:32px;height:32px;padding:0;border:0;border-radius:8px;background:var(--muted)!important;color:var(--muted-foreground)!important;box-shadow:none;transition:background .15s ease,color .15s ease,opacity .15s ease}
+html[data-theme][data-theme] .acts button.ic svg{width:16px;height:16px}
+html[data-theme][data-theme] .acts button.ic:hover{background:var(--muted)!important;color:var(--foreground)!important}
+html[data-theme][data-theme] .acts button.ic[data-a="next"]{background:color-mix(in oklab,var(--pending) 20%,transparent)!important;color:var(--pending)!important}
+html[data-theme][data-theme] .acts button.ic[data-a="next"]:hover{background:color-mix(in oklab,var(--pending) 30%,transparent)!important;color:var(--pending)!important}
+html[data-theme][data-theme] .acts button.ic[data-a="del"]:hover{background:color-mix(in oklab,var(--destructive) 15%,transparent)!important;color:var(--destructive)!important}
+
+/* Calendario */
+html[data-theme][data-theme] .calbox{border-radius:18px;padding:16px}
+html[data-theme][data-theme] .ev a{color:var(--foreground)}
+html[data-theme][data-theme] .ev time{color:var(--muted-foreground)}
+
+/* Pantalla de acceso */
+html[data-theme][data-theme] #lock-screen{background-color:var(--background);background-image:var(--glow)}
+html[data-theme][data-theme] #lock-box{border-radius:22px}
+html[data-theme][data-theme] #lock-box input{height:auto;background:var(--muted);border:1px solid var(--border);border-radius:14px}
+html[data-theme][data-theme] #lock-box button{height:auto;background:var(--pending);color:oklch(1 0 0);border-radius:14px;font-weight:600}
+html[data-theme][data-theme] #lock-form:focus-within{border-color:transparent}
+
+/* Pantalla grande (lg) */
+@media(min-width:1024px){
+  html[data-theme][data-theme] body{padding:40px 32px}
+  html[data-theme][data-theme] h1{font-size:40px}
+  html[data-theme][data-theme] .stats{grid-template-columns:repeat(4,1fr)}
+  html[data-theme][data-theme] .stat{padding:20px}
+  html[data-theme][data-theme] .stat b{font-size:30px}
+  html[data-theme][data-theme] .stat span{font-size:14px}
+  html[data-theme][data-theme] .cols{grid-template-columns:repeat(3,1fr)}
+}
 </style>
 <script>
 (function(){
@@ -408,6 +589,7 @@ function bonita(s){if(!s)return"Sin fecha";return new Date(s).toLocaleString("es
 function mismoDia(a,b){return a.toDateString()===b.toDateString()}
 
 var IC={
+clock:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
 prev:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>',
 warn:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
 next:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>',
@@ -430,14 +612,14 @@ function pintar(){
   ESTATUS.forEach(function(est){
     var lista=tareas.filter(function(t){return t.e===est&&(!ag||t.ag===ag)&&(!ar||t.ar===ar)&&(!ti||t.ti===ti)});
     lista.sort(function(a,b){return (a.f||"9").localeCompare(b.f||"9")});
-    html+='<div class="col"><h2>'+est+' ('+lista.length+')</h2>';
+    html+='<div class="col"><h2><span>'+est+'</span><span class="cnt">'+lista.length+'</span></h2>';
     if(!lista.length)html+='<div class="empty">Sin actividades</div>';
     lista.forEach(function(t){
       var late=t.e!=="Listo"&&t.f&&new Date(t.f)<ahora;
-      html+='<div class="t '+esc(t.p||"")+'"><div class="n">'+esc(t.n)+'</div><div class="m'+(late?' late':'')+'">'+esc(t.ag)+' · '+esc(t.ar)+(t.ti?' · '+esc(t.ti):'')+'<br>'+bonita(t.f)+(late?' <span class="ov" title="Vencido" aria-label="Vencido">'+IC.warn+'</span>':'')+'</div><div class="acts">';
+      html+='<div class="t '+esc(t.p||"")+'"><div class="n">'+esc(t.n)+'</div><div class="chips"><span class="chip">'+esc(t.ag)+'</span><span class="chip">'+esc(t.ar)+'</span>'+(t.ti?'<span class="chip">'+esc(t.ti)+'</span>':'')+'</div><div class="foot"><div class="m'+(late?' late':'')+'">'+IC.clock+'<span>'+bonita(t.f)+(late?' · Vencido':'')+'</span></div><div class="acts">';
       if(est!=="Pendiente")html+='<button class="ic" data-a="prev" title="Atrás" aria-label="Atrás" data-i="'+esc(t.id)+'">'+IC.prev+'</button>';
       if(est!=="Listo")html+='<button class="ic" data-a="next" title="Avanzar" aria-label="Avanzar" data-i="'+esc(t.id)+'">'+IC.next+'</button>';
-      html+='<button class="ic" data-a="edit" title="Editar" aria-label="Editar" data-i="'+esc(t.id)+'" style="background:var(--bd);color:var(--tx);">'+IC.edit+'</button><button class="ic" data-a="del" title="Borrar" aria-label="Borrar" data-i="'+esc(t.id)+'" style="background:#fde8e8;color:var(--err);">'+IC.del+'</button></div></div>';
+      html+='<button class="ic" data-a="edit" title="Editar" aria-label="Editar" data-i="'+esc(t.id)+'" style="background:var(--bd);color:var(--tx);">'+IC.edit+'</button><button class="ic" data-a="del" title="Borrar" aria-label="Borrar" data-i="'+esc(t.id)+'" style="background:#fde8e8;color:var(--err);">'+IC.del+'</button></div></div></div>';
     });
     html+='</div>';
   });
